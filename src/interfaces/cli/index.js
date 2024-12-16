@@ -2,11 +2,14 @@ const dateformat = require("dateformat");
 
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
+const path = require("path");
+const fs = require("fs");
 
-module.exports = (book) => {
+module.exports = (book, filename) => {
 	const player = {
 		_speed: 250,
 		_book: undefined,
+		_filename: undefined,
 		_current: 0,
 
 		_screen: undefined,
@@ -138,7 +141,25 @@ module.exports = (book) => {
 
 			player._textBox.append(player._text);
 
+			const uniFilename = path.join(
+				path.dirname(filename),
+				"." + path.basename(filename) + ".uni"
+			);
+			if (fs.existsSync(uniFilename)) {
+				let data = JSON.parse(fs.readFileSync(uniFilename, "utf8"));
+				if (data.speed) player._speed = data.speed;
+				if (data.current) player._current = data.current;
+			}
 			player._screen.key(["escape", "q", "C-c"], function() {
+				// Write JSON data
+				fs.writeFileSync(
+					uniFilename,
+					JSON.stringify({
+						current: player._current,
+						speed: player._speed
+					}),
+					"utf8"
+				);
 				return process.exit(0);
 			});
 
@@ -187,6 +208,8 @@ module.exports = (book) => {
 
 				player._draw();
 			});
+
+			
 
 			player._screen.render();
 

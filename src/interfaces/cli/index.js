@@ -74,7 +74,7 @@ module.exports = (book) => {
 				mouse: true
 			});
 
-			let help = grid.set(11, 0, 1, 12, blessed.text, {
+			let help = grid.set(11, 0, 1, 9, blessed.text, {
 				style: {
 					selected: {
 						bg: "red"
@@ -84,6 +84,53 @@ module.exports = (book) => {
 			});
 
 			help.append(blessed.text({label: "space pause | j/k Next/prev chapter | -/+ speed up/down | h/l rewind back/forward | q escape "}));
+			let wordIndexForm = grid.set(11, 9, 1, 3, blessed.form, {
+				label: "Skip to Word - s or click below",
+				keys: true,
+				mouse: true,
+				border: "line"
+			});
+
+			let wordIndexInput = blessed.textbox({
+				parent: wordIndexForm,
+				name: "wordIndex",
+				inputOnFocus: true,
+				showCursor: true,
+				width: 11,
+				height: 1,
+				left: 0,
+				top: 0,
+				keys: true
+			});
+
+			// When user presses Enter inside the textbox
+			wordIndexInput.on("submit", (value) => {
+				let target = parseInt(value, 10);
+				if (!isNaN(target) && target >= 0 && target < player._book.text.length) {
+					player._current = target;
+					player._draw();
+				}
+				// Clear input for next time
+				wordIndexInput.clearValue();
+				player._screen.render();
+			});
+
+			// Submit on Enter key
+			player._screen.key("enter", function() {
+				if (wordIndexInput.focused) {
+					wordIndexInput.submit();
+				}
+			});
+			wordIndexInput.on("click", () => {
+			//	wordIndexInput.focus(); For some reason this causes double typing
+				player._screen.render();
+			});
+
+			player._screen.key(["s"], function() {
+				wordIndexInput.focus();
+				player._screen.render();
+			});
+			player._screen.render();
 
 			player._text = blessed.text({
 				label: "Book"

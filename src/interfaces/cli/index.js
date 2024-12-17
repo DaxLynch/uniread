@@ -111,6 +111,15 @@ module.exports = (book, filename) => {
 				let target = parseInt(value, 10);
 				if (!isNaN(target) && target >= 0 && target < player._book.text.length) {
 					player._current = target;
+					let currentChapter = -1;
+					player._book.links.some((link, key) => {//This sets the chapter.
+						currentChapter = key - 1;			//Otherwise, if you skip to a part halfway througha chapter,
+						//tickFunction will set current back to the start of the chapter
+						return link.word > player._current + 1;
+					});
+					player._chapterList.select(currentChapter);
+					player._current = target;//Have to set current to target again, as select.chapter sets current to the start of the chapter
+
 					player._draw();
 				}
 				// Clear input for next time
@@ -150,9 +159,9 @@ module.exports = (book, filename) => {
 				if (data.speed) player._speed = data.speed;
 				if (data.current) player._current = data.current;
 				let currentChapter = -1;
-				player._book.links.some((link, key) => { //This sets the chapter.
-					currentChapter = key - 1;            //Otherwise, if you skip to a part halfway througha chapter,
-					                                     //tickFunction will set current back to the start of the chapter
+				player._book.links.some((link, key) => {//This sets the chapter.
+					currentChapter = key - 1;			//Otherwise, if you skip to a part halfway througha chapter,
+					//tickFunction will set current back to the start of the chapter
 					return link.word > player._current + 1;
 				});
 				player._chapterList.select(currentChapter);

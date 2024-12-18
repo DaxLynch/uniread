@@ -118,6 +118,7 @@ module.exports = (book, filename) => {
 						return link.word > player._current + 1;
 					});
 					player._chapterList.select(currentChapter);
+					player._chapter = currentChapter;
 					player._current = target;//Have to set current to target again, as select.chapter sets current to the start of the chapter
 
 					player._draw();
@@ -165,6 +166,7 @@ module.exports = (book, filename) => {
 					return link.word > player._current + 1;
 				});
 				player._chapterList.select(currentChapter);
+				player._chapter = currentChapter;
 				if (data.current) player._current = data.current;
 
 			}
@@ -255,11 +257,11 @@ module.exports = (book, filename) => {
 
 				player._book.links.some((link, key) => {
 					currentChapter = key - 1;
-
 					return link.word > player._current + 1;
-				});
-
+				}); //This returns the word of the current chapter
+				
 				if(currentChapter !== player._chapter){
+					player._chapter = currentChapter;
 					player._chapterList.select(currentChapter);
 				}
 
